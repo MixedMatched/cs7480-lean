@@ -1,6 +1,8 @@
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.Data.Fintype.Defs
 import Mathlib.Data.Finset.Powerset
+import Mathlib.CategoryTheory.Limits.Shapes.Terminal
+import Mathlib.CategoryTheory.Limits.Shapes.Products
 
 /-
 Problem 1:
@@ -53,17 +55,17 @@ Problem 1:
     This will involve showing that some entailments are valid.
 -/
 
-inductive Formula (Name : Type) where
-  | var (name : Name)
+inductive Formula (Names : Type) where
+  | var (name : Names)
   | top
   | bot
-  | and (φ : Formula Name) (ψ : Formula Name)
-  | or (φ : Formula Name) (ψ : Formula Name)
-  | not (φ : Formula Name)
+  | and (φ : Formula Names) (ψ : Formula Names)
+  | or (φ : Formula Names) (ψ : Formula Names)
+  | not (φ : Formula Names)
 
-def Subst (Name : Type) := Name → Bool
+def Subst (Names : Type) := Names → Bool
 
-def eval {Name : Type} : Formula Name → Subst Name → Bool
+def eval {Names : Type} : Formula Names → Subst Names → Bool
   | Formula.var x, γ => γ x
   | Formula.top, _ => true
   | Formula.bot, _ => false
@@ -72,15 +74,15 @@ def eval {Name : Type} : Formula Name → Subst Name → Bool
   | Formula.not φ, γ => not (eval φ γ)
 
 -- the set of substitutions which evaluate to true
-def Mods {Name : Type} (φ : Formula Name) : Set (Subst Name) :=
+def Mods {Names : Type} (φ : Formula Names) : Set (Subst Names) :=
   {γ | eval φ γ = true}
 
 -- semantic entailment
-def entails {Name : Type} (φ ψ : Formula Name) : Prop :=
+def entails {Names : Type} (φ ψ : Formula Names) : Prop :=
   Mods φ ⊆ Mods ψ
 
-instance formulaCategory {Name : Type} : CategoryTheory.Category (Formula Name) where
-  -- Prop isn't in the correct type universe (because of Name), so we must lift it
+instance formulaCategory {Names : Type} : CategoryTheory.Category (Formula Names) where
+  -- Prop isn't in the correct type universe (because of Names), so we must lift it
   Hom φ ψ := PLift (entails φ ψ)
   -- straightforward-ly, the identity and composition functions
   id φ := by
@@ -162,6 +164,15 @@ Problem 2:
     \end{enumerate}
 -/
 
+structure FTS where
+  (X : Type)
+  [finite : Fintype X]
+  (α : X → X)
+
+instance FTSCategory : CategoryTheory.Category FTS where
+  Hom := sorry
+  id := sorry
+  comp := sorry
 
 /-
 Problem 3:
@@ -187,6 +198,11 @@ Problem 3:
     \mathsf{cod}$, $\mathsf{id}$, and $\mathsf{comp}$.
 -/
 
+instance sliceCategory
+  {T : Type} {C : CategoryTheory.Category T} {X : T} : CategoryTheory.Category T where
+  Hom := sorry
+  id := sorry
+  comp := sorry
 
 /-
 Problem 4:
@@ -237,6 +253,8 @@ Problem 5:
     Show that $\mathsf{Formula}$ has products and a terminal object. What do they mean logically?
 -/
 
+theorem FormulaTerminal {Names : Type} : CategoryTheory.Limits.HasTerminal (Formula Names) := by
+  sorry
 
 /-
 Problem 6:
