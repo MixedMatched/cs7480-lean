@@ -53,58 +53,39 @@ Problem 1: $\mathsf{Formula}$: the category of syntactic Boolean formulae and en
     This will involve showing that some entailments are valid.
 -/
 
-inductive VarFormula (Name : Type) where
-| Variable (name: Name)
-| And (op1: VarFormula Name) (op2: VarFormula Name)
-| Or (op1: VarFormula Name) (op2: VarFormula Name)
-| Not (op: VarFormula Name)
-deriving Repr, DecidableEq
+inductive Formula (Name : Type) where
+  | var (name : Name)
+  | top
+  | bot
+  | and (φ : Formula Name) (ψ : Formula Name)
+  | or (φ : Formula Name) (ψ : Formula Name)
+  | not (φ : Formula Name)
 
-inductive BoolFormula where
-| Constant (value: Bool)
-| And (op1: BoolFormula) (op2: BoolFormula)
-| Or (op1: BoolFormula) (op2: BoolFormula)
-| Not (op: BoolFormula)
+def Subst (Name : Type) := Name → Bool
 
-namespace VarFormula
+def eval {Name : Type} : Formula Name → Subst Name → Bool
+  | Formula.var x, γ => γ x
+  | Formula.top, _ => true
+  | Formula.bot, _ => false
+  | Formula.and φ ψ, γ => and (eval ψ γ) (eval φ γ)
+  | Formula.or φ ψ, γ => or (eval ψ γ) (eval φ γ)
+  | Formula.not φ, γ => not (eval φ γ)
 
-def substitute {Name : Type} (vf : VarFormula Name) (substitution : Name → Bool) : BoolFormula :=
-  match vf with
-  | Variable name => BoolFormula.Constant (substitution name)
-  | And op1 op2 => BoolFormula.And (substitute op1 substitution) (substitute op2 substitution)
-  | Or op1 op2 => BoolFormula.Or (substitute op1 substitution) (substitute op2 substitution)
-  | Not op => BoolFormula.Not (substitute op substitution)
+def Mods {Name : Type} (φ : Formula Name) : Set (Subst Name) :=
+  {γ | eval φ γ = true}
 
-end VarFormula
+def entails {Name : Type} (φ ψ : Formula Name) : Prop :=
+  Mods φ ⊆ Mods ψ
 
-namespace BoolFormula
-
-def evaluate (formula : BoolFormula) : Bool :=
-  match formula with
-  | Constant value => value
-  | And op1 op2 => and (evaluate op1) (evaluate op2)
-  | Or op1 op2 => or (evaluate op1) (evaluate op2)
-  | Not op => not (evaluate op)
-
-end BoolFormula
-
-namespace VarFormula
-
-def models {Name : Type} [finite : Fintype Name] [deq : DecidableEq Name]
-  (formula : VarFormula Name) : Finset (Name → Bool) :=
-  -- 1. get the elements from `finite`
-  -- 2. turn it into a Finset
-  -- 3. create a Finset of every possible unique function Name → Bool
-  -- 4. filter the Finset on the evaluation of the substitution of `formula` w/ each function
-  let name_set := finite.elems
-  let name_to_bool_set := name_set.powerset.image (fun set => fun name => decide (name ∈ set))
-  name_to_bool_set.filter (fun set => (formula.substitute set).evaluate)
-
-end VarFormula
-
-instance {Name : Type} : CategoryTheory.Category (VarFormula Name) :=
-  {
-    Hom := sorry
-    id := sorry
-    comp := sorry
-  }
+instance formulaCategory {Name : Type} : CategoryTheory.Category (Formula Name) where
+  Hom φ ψ := PLift (entails φ ψ)
+  id φ := by
+    apply PLift.up
+    intro γ hγ
+    exact hγ
+  comp {φ ψ x} h₁ h₂ := by
+    apply PLift.up
+    apply PLift.down at h₁
+    apply PLift.down at h₂
+    intro γ hγ
+    exact h₂ (h₁ hγ)
