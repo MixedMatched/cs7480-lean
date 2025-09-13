@@ -1,13 +1,3 @@
 # cs7480-lean
 
-## GitHub configuration
-
-To set up your new GitHub repository, follow these steps:
-
-* Under your repository name, click **Settings**.
-* In the **Actions** section of the sidebar, click "General".
-* Check the box **Allow GitHub Actions to create and approve pull requests**.
-* Click the **Pages** section of the settings sidebar.
-* In the **Source** dropdown menu, select "GitHub Actions".
-
-After following the steps above, you can remove this section from the README file.
+this is an attempt at formalizing the assignments from northeastern's fall 2025 [cs7480 class](https://sholtzen.dev/fall25-categories/) (categories for pl). if you find anything to be wrong, please feel free to correct :).
