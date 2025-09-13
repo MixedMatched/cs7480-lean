@@ -198,8 +198,13 @@ Problem 3:
     \mathsf{cod}$, $\mathsf{id}$, and $\mathsf{comp}$.
 -/
 
+structure sliceObject (T : Type) (C : CategoryTheory.Category T) (X : T) where
+  (A : T)
+  (morphism : C.Hom A X)
+
 instance sliceCategory
-  {T : Type} {C : CategoryTheory.Category T} {X : T} : CategoryTheory.Category T where
+  {T : Type} {C : CategoryTheory.Category T} {X : T} :
+    CategoryTheory.Category (sliceObject T C X) where
   Hom := sorry
   id := sorry
   comp := sorry
