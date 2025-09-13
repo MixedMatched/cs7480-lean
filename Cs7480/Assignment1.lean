@@ -91,7 +91,7 @@ end BoolFormula
 namespace VarFormula
 
 def models {Name : Type} [finite : Fintype Name] [deq : DecidableEq Name]
-  (formula : VarFormula Name) : Set (Name → Bool) :=
+  (formula : VarFormula Name) : Finset (Name → Bool) :=
   -- 1. get the elements from `finite`
   -- 2. turn it into a Finset
   -- 3. create a Finset of every possible unique function Name → Bool
