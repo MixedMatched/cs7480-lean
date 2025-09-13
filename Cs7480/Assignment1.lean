@@ -170,9 +170,20 @@ structure FTS where
   (α : X → X)
 
 instance FTSCategory : CategoryTheory.Category FTS where
-  Hom := sorry
-  id := sorry
-  comp := sorry
+  Hom X Y := PLift (∃ f, f ∘ X.α = Y.α ∘ f)
+  id A := by
+    apply PLift.up
+    exists (fun x ↦ x)
+  comp := by
+    intro X Y Z
+    intro f g
+    apply PLift.up
+    apply PLift.down at f
+    apply PLift.down at g
+    obtain ⟨f_XY, hf⟩ := f
+    obtain ⟨g_YZ, hg⟩ := g
+    exists g_YZ ∘ f_XY
+    rw [Function.comp_assoc, hf, ← Function.comp_assoc, hg, Function.comp_assoc]
 
 /-
 Problem 3:
