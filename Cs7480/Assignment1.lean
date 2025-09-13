@@ -3,7 +3,7 @@ import Mathlib.Data.Fintype.Defs
 import Mathlib.Data.Finset.Powerset
 
 /-
-Problem 1: $\mathsf{Formula}$: the category of syntactic Boolean formulae and entailment]
+Problem 1:
   Consider the following grammar of Boolean formulae:
   \begin{align}
     \varphi, \psi ::= x \mid \varphi \land \psi \mid \varphi \lor \psi \mid \neg \psi
@@ -106,3 +106,179 @@ instance formulaCategory {Name : Type} : CategoryTheory.Category (Formula Name) 
   assoc {w x y z} h₁ h₂ h₃ := by
     rw [PLift.down]
     exact h₃
+
+/-
+Problem 2:
+    Consider the following components of a category whose objects are finite
+    transition systems and whose morphisms denote ``abstractions'' of transition systems:
+    \begin{itemize}
+      \item Objects are pairs $(X, \alpha)$ where $X$ is a finite set and
+      $\alpha : X \rightarrow X$ is a function.
+      \item Morphisms are triples $((X,\alpha), f, (Y, \beta))$
+      where (1) $f$ is a function $f : X \to Y$, and (2)
+      $f$ satisfies
+       $f \circ \alpha = \beta \circ f$. These morphisms can be drawn
+      as commutative squares:
+      \begin{center}
+        % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAA0QBfU9TXfIRRkAjFVqMWbTjz7Y8BIiPLj6zVohABNbrxAZ5gpaTHU1UzTq7iYUAObwioAGYAnCAFskZEDghIAJjNJDRBnXRd3L0RlX39EAGZg9TZw2TCo72o-JFjzUIAdAsY0AAs6CIzPQOz4pIkUzSKAIxgcCusuIA
+\begin{tikzcd}
+  X \arrow[r, "f"] \arrow[d, "\alpha"] & Y \arrow[d, "\beta"] \\
+  X \arrow[r, "f"]                     & Y
+  \end{tikzcd}
+      \end{center}
+      \item The domain of a morphism is:
+      $$
+      \mathsf{dom}\left( \begin{tikzcd}
+  X \arrow[r, "f"] \arrow[d, "\alpha"] & Y \arrow[d, "\beta"] \\
+  X \arrow[r, "f"]                     & Y
+  \end{tikzcd}
+\right) = (X, \alpha)
+      $$
+      \item The codomain of a morphism is:
+      $$
+      \mathsf{dom}\left( \begin{tikzcd}
+  X \arrow[r, "f"] \arrow[d, "\alpha"] & Y \arrow[d, "\beta"] \\
+  X \arrow[r, "f"]                     & Y
+  \end{tikzcd}
+\right) = (Y, \beta)
+      $$
+    \item The identity morphism is
+      $\mathsf{id}((X, \alpha))=((X, \alpha), x \mapsto x, (X, \alpha))$
+      where \(x \mapsto x\) denotes the identity function on \(X\).
+    \item For two morphisms $((X, \alpha), f, (Y, \beta))$
+    and $((Y, \beta), g, (Z, \gamma))$, composition is defined in terms of
+    composition of functions:
+    \begin{align*}
+      ((Y, \beta), g, (Z, \gamma)) \circ ((X, \alpha), f, (Y, \beta)) =
+      ((X, \alpha), g \circ f, (Z, \gamma))
+    \end{align*}
+    \end{itemize}
+    \begin{enumerate}
+      \item Show that $\mathsf{FinSet}^\circlearrowright$  satisfies the definition of a category.
+    This will entail showing that $\mathsf{id}$ and $\mathsf{comp}$ define valid morphisms.
+      \item Draw some internal pictures of morphisms in this category.
+      \item In what sense does a morphism $((X, \alpha), f, (Y, \beta))$ define
+      an abstraction of the transition system $(X, \alpha)$?
+    \end{enumerate}
+-/
+
+
+/-
+Problem 3:
+    It is very common in category theory to form one category out of another category.
+    Let's see an example of this.
+    Let $\mathcal{C}$ be a category and $X$ be an object in $\mathcal{C}$.
+    Then, the \emph{slice category} $\mathcal{C}/X$ is a category where:
+    \begin{itemize}
+      \item Objects are morphisms of $\mathcal{C}$ with codomain $X$, i.e.
+      $O = \{A \xrightarrow{f} X \mid A \in \mathcal{C}\}$
+      \item Morphisms are triples $(A \xrightarrow{f} X, A \xrightarrow{h} B, B \xrightarrow{g} X)$
+      satisfying $g \circ h = f$. These can be drawn as commutative triangles:
+      $$
+      M = \left\{\left.% https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAEEQBfU9TXfIRQAmclVqMWbAELdeIDNjwEiARlKrx9Zq0QgAGt3EwoAc3hFQAMwBOEALZIyIHBCTqQDOgCMYDAAr8ykKeMFY4INTaUnoAFnLWdo6Izq5IohI6bFYJILYO7tRpiBnRuiCmRlxAA
+      \begin{tikzcd}
+      A \arrow[rr, "h"] \arrow[rd, "f"] &   & B \arrow[ld, "g"] \\
+                                        & X &
+      \end{tikzcd} \right|~ A \xrightarrow{h} B, A \xrightarrow{f} X, B \xrightarrow{g} X
+      \text{are morphisms of \(\mathcal C\)}, f = g \circ h \right\}
+      $$
+    \end{itemize}
+    Show that $\mathcal{C}/X$ is a category and identify the definition of $\mathsf{dom},
+    \mathsf{cod}$, $\mathsf{id}$, and $\mathsf{comp}$.
+-/
+
+
+/-
+Problem 4:
+    Recall the definition of STLC from Assignment 0.
+    Contexts $\Gamma$ were defined inductively
+    using the following grammar:
+    \begin{equation*}
+      \mathsf{Ctx} \ni \Gamma ::= \bullet \mid \Gamma, x\ofty A
+    \end{equation*}
+    where $\bullet$ denotes the empty context.
+    It is equivalently possible to view contexts
+    as a finite product, i.e.
+    the context $x_1 \ofty A_1, \dots, x_n \ofty A_n$
+    viewed as a list
+    gets interpreted as the product
+    $A_1 \times \cdots \times A_n$ (where $1$ is the empty product),
+    and each variable $x_i$ is interpreted as a
+    projection $\plproj{i}{} \ofty A_1 \times \cdots \times A_n \to A_i$.
+    With this interpretation, STLC forms a category
+    in the following sense:
+    \begin{itemize}
+      \item objects are types $A$;
+      \item a morphism $A \to B$ is an equivalence class
+      of STLC terms $[\judge{a\ofty A}{M}{B}]$,
+      given by:
+      \begin{equation*}
+        [\judge{a\ofty A}{M}{B}] = [\judge{a\ofty A}{N}{B}]
+        \Longleftrightarrow
+        \judge{a\ofty A}{M \equiv N}{B}
+      \end{equation*}
+      \item Composition is given by substitution:
+      \begin{equation*}
+        [\judge{b\ofty B}{N}{C}] \circ [\judge{a\ofty A}{M}{B}] = [\judge{a\ofty A}{N[M/b]}{C}]
+      \end{equation*}
+      %% [Note the variable in context $x$ has the same name for all morphisms!];
+      \item the identity morphism $\id_A: A \to A$ is given by the
+        term $[\judge{a\ofty A}{a}{A}]$.
+    \end{itemize}
+    Prove that STLC satisfies the axioms of a category. You
+    will find yourself proving some utility lemmas about substitution, which are
+    proven using structural induction. If you want, you can prove those lemmas
+    for practice, or simply state them.
+-/
+
+
+/-
+Problem 5:
+    Show that $\mathsf{Formula}$ has products and a terminal object. What do they mean logically?
+-/
+
+
+/-
+Problem 6:
+    Show that $\mathsf{FinSet}^\circlearrowright$ has products. Does it have a terminal object?
+    If you know what coproducts are: does it have coproducts?
+-/
+
+
+/-
+Problem 7:
+    Suppose a category $\mathcal{C}$ has products. Prove that for any objects $A,B$, and $C$,
+    it is the case that $(A \times B) \times C \cong A \times (B \times C)$ (recall that $\cong$
+    means isomorphism of objects).
+
+    Note: This may take a lot of space. We will see a better way to prove this later.
+-/
+
+
+/-
+Problem 8:
+    Let \(X\) be an object of \(\mathsf{FinSet}\).
+    Show that elements of \(X\) (when considered as a finite set)
+    are in bijection with morphisms in \(\mathsf{FinSet}\)
+    from \(1\) to \(X\),
+    where \(1\) is the terminal object of \(\mathsf{FinSet}\).
+-/
+
+
+/-
+Problem 9:
+    Suppose \(U\) and \(V\) are subsets of a finite set \(X\).
+    Show that \(U \subseteq V\) if and only if
+    there exists a dashed \(\FinSet\)-morphism \(f\)
+    such that \(f \circ v = u\),
+    where \(u\) and \(v\) are the \(\FinSet\)-morphisms
+    corresponding to the inclusion functions \(U \to X\) and \(V \to X\)
+    respectively:
+    \begin{equation}
+      % https://tikzcd.yichuanshen.de/#N4Igdg9gJgpgziAXAbVABwnAlgFyxMJZABgBpiBdUkANwEMAbAVxiRAFUQBfU9TXfIRQAmclVqMWbAGrdeIDNjwEiARlKrx9Zq0QgAGt3EwoAc3hFQAMwBOEALZIyIHBCSiXdLAzY4vP6m0pPSYQagY6ACMYBgAFfmUhEBssUwALHDlrO0dEdRc3RA8-b19-MIkdNhoskFsHJ2pXJHySnz1IMFZwrC62KDo4NJMKoN06oy4gA
+    \begin{tikzcd}
+    U \arrow[rd, "u"'] \arrow[rr, "f", dashed] &   & V \arrow[ld, "v"] \\
+                                                    & X &
+    \end{tikzcd}
+    \end{equation}
+-/
