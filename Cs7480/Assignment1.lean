@@ -93,3 +93,16 @@ instance formulaCategory {Name : Type} : CategoryTheory.Category (Formula Name) 
     apply PLift.down at h₂
     intro γ hγ
     exact h₂ (h₁ hγ)
+  -- because comp and id are straightforward, so are the left and right id composition laws
+  id_comp := by
+    simp only
+    intro x y f
+    trivial
+  comp_id := by
+    simp only
+    intro x y f
+    trivial
+  -- lean magic :eyeroll:
+  assoc {w x y z} h₁ h₂ h₃ := by
+    rw [PLift.down]
+    exact h₃
