@@ -80,7 +80,7 @@ def entails {Name : Type} (φ ψ : Formula Name) : Prop :=
   Mods φ ⊆ Mods ψ
 
 instance formulaCategory {Name : Type} : CategoryTheory.Category (Formula Name) where
-  -- Prop isn't the correct type universe (because of Name), so we must lift it
+  -- Prop isn't in the correct type universe (because of Name), so we must lift it
   Hom φ ψ := PLift (entails φ ψ)
   -- straightforward-ly, the identity and composition functions
   id φ := by
@@ -102,7 +102,7 @@ instance formulaCategory {Name : Type} : CategoryTheory.Category (Formula Name) 
     simp only
     intro x y f
     trivial
-  -- lean magic :eyeroll:
+  -- assoc is also pretty straightforward, but not as easy as id_comp and comp_id
   assoc {w x y z} h₁ h₂ h₃ := by
     rw [PLift.down]
     exact h₃
