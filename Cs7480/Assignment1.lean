@@ -1,5 +1,6 @@
 import Mathlib.CategoryTheory.Category.Basic
 import Mathlib.Data.Fintype.Defs
+import Mathlib.Data.Finset.Powerset
 
 /-
 Problem 1: $\mathsf{Formula}$: the category of syntactic Boolean formulae and entailment]
@@ -57,6 +58,7 @@ inductive VarFormula (Name : Type) where
 | And (op1: VarFormula Name) (op2: VarFormula Name)
 | Or (op1: VarFormula Name) (op2: VarFormula Name)
 | Not (op: VarFormula Name)
+deriving Repr, DecidableEq
 
 inductive BoolFormula where
 | Constant (value: Bool)
@@ -88,12 +90,15 @@ end BoolFormula
 
 namespace VarFormula
 
-def models {Name : Type} {finite : Fintype Name} (formula : VarFormula Name) : Set (Name → Bool) :=
+def models {Name : Type} [finite : Fintype Name] [deq : DecidableEq Name]
+  (formula : VarFormula Name) : Set (Name → Bool) :=
   -- 1. get the elements from `finite`
-  -- 2. turn it into a set
-  -- 3. create a set of every possible unique function Name → Bool
-  -- 4. filter the set on the evaluation of the substitution of `formula` w/ each function
-  sorry
+  -- 2. turn it into a Finset
+  -- 3. create a Finset of every possible unique function Name → Bool
+  -- 4. filter the Finset on the evaluation of the substitution of `formula` w/ each function
+  let name_set := finite.elems
+  let name_to_bool_set := name_set.powerset.image (fun set => fun name => decide (name ∈ set))
+  name_to_bool_set.filter (fun set => (formula.substitute set).evaluate)
 
 end VarFormula
 
