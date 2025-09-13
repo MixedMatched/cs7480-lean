@@ -71,14 +71,18 @@ def eval {Name : Type} : Formula Name → Subst Name → Bool
   | Formula.or φ ψ, γ => or (eval ψ γ) (eval φ γ)
   | Formula.not φ, γ => not (eval φ γ)
 
+-- the set of substitutions which evaluate to true
 def Mods {Name : Type} (φ : Formula Name) : Set (Subst Name) :=
   {γ | eval φ γ = true}
 
+-- semantic entailment
 def entails {Name : Type} (φ ψ : Formula Name) : Prop :=
   Mods φ ⊆ Mods ψ
 
 instance formulaCategory {Name : Type} : CategoryTheory.Category (Formula Name) where
+  -- Prop isn't the correct type universe (because of Name), so we must lift it
   Hom φ ψ := PLift (entails φ ψ)
+  -- straightforward-ly, the identity and composition functions
   id φ := by
     apply PLift.up
     intro γ hγ
