@@ -89,7 +89,7 @@ instance formulaCategory {Names : Type} : CategoryTheory.Category (Formula Names
     apply PLift.up
     intro γ hγ
     exact hγ
-  comp {φ ψ x} h₁ h₂ := by
+  comp {x y z} h₁ h₂ := by
     apply PLift.up
     apply PLift.down at h₁
     apply PLift.down at h₂
@@ -169,21 +169,30 @@ structure FTS where
   [finite : Fintype X]
   (α : X → X)
 
+structure FTSMorphism (φ ψ : FTS) where
+  (f : φ.X → ψ.X)
+  (satisfies : f ∘ φ.α = ψ.α ∘ f)
+
 instance FTSCategory : CategoryTheory.Category FTS where
-  Hom X Y := PLift (∃ f, f ∘ X.α = Y.α ∘ f)
-  id A := by
-    apply PLift.up
-    exists (fun x ↦ x)
-  comp := by
-    intro X Y Z
-    intro f g
-    apply PLift.up
-    apply PLift.down at f
-    apply PLift.down at g
-    obtain ⟨f_XY, hf⟩ := f
-    obtain ⟨g_YZ, hg⟩ := g
-    exists g_YZ ∘ f_XY
-    rw [Function.comp_assoc, hf, ← Function.comp_assoc, hg, Function.comp_assoc]
+  Hom X Y := FTSMorphism X Y
+  id A := {
+    f := id
+    satisfies := by simp
+  }
+  comp {x y z} h₁ h₂ := by
+    obtain ⟨f, satisfies_f⟩ := h₁
+    obtain ⟨g, satisfies_g⟩ := h₂
+    exact {
+      f := g ∘ f
+      satisfies := by
+        rw [Function.comp_assoc, satisfies_f, ← Function.comp_assoc, satisfies_g]
+        rfl
+    }
+  id_comp := by simp_all only [Function.comp_id, implies_true]
+  comp_id := by simp_all only [Function.id_comp, implies_true]
+  assoc {w x y z} h₁ h₂ h₃ := by
+    simp_all only [FTSMorphism.mk.injEq]
+    rfl
 
 /-
 Problem 3:
