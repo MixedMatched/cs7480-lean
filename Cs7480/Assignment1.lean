@@ -188,10 +188,10 @@ instance FTSCategory : CategoryTheory.Category FTS where
         rw [Function.comp_assoc, satisfies_f, ← Function.comp_assoc, satisfies_g]
         rfl
     }
-  id_comp := by simp_all only [Function.comp_id, implies_true]
-  comp_id := by simp_all only [Function.id_comp, implies_true]
+  id_comp := by simp only [Function.comp_id, implies_true]
+  comp_id := by simp only [Function.id_comp, implies_true]
   assoc {w x y z} h₁ h₂ h₃ := by
-    simp_all only [FTSMorphism.mk.injEq]
+    simp only [FTSMorphism.mk.injEq]
     rfl
 
 /-
@@ -234,16 +234,15 @@ instance sliceCategory
   Hom φ ψ := SliceMorphism φ ψ
   id A := {
     h := C.id A.A
-    satisfies := by simp
+    satisfies := by exact CategoryTheory.Category.id_comp A.morphism
   }
   comp h₁ h₂ := {
     h := C.comp h₁.h h₂.h
-    satisfies :=
-      by rw [CategoryTheory.Category.assoc, h₂.satisfies, h₁.satisfies]
+    satisfies := by rw [CategoryTheory.Category.assoc, h₂.satisfies, h₁.satisfies]
   }
-  comp_id := by simp
-  id_comp := by simp
-  assoc := by simp
+  comp_id := by simp only [CategoryTheory.Category.comp_id, implies_true]
+  id_comp := by simp only [CategoryTheory.Category.id_comp, implies_true]
+  assoc := by simp only [CategoryTheory.Category.assoc, implies_true]
 
 /-
 Problem 4:
