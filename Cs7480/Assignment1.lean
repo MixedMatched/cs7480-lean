@@ -222,16 +222,28 @@ structure sliceObject (T : Type) (C : CategoryTheory.Category T) (X : T) where
   (A : T)
   (morphism : C.Hom A X)
 
-def SliceMorphism
-  {T : Type} {C : CategoryTheory.Category T} {X : T} (φ ψ : sliceObject T C X) : Prop :=
-  ∃ h : C.Hom φ.A ψ.A, C.comp h ψ.morphism = φ.morphism
+structure SliceMorphism
+  {T : Type} {C : CategoryTheory.Category T} {X : T} (φ ψ : sliceObject T C X)
+where
+  (h : C.Hom φ.A ψ.A)
+  (satisfies : C.comp h ψ.morphism = φ.morphism)
 
 instance sliceCategory
   {T : Type} {C : CategoryTheory.Category T} {X : T} :
     CategoryTheory.Category (sliceObject T C X) where
-  Hom φ ψ := PLift (SliceMorphism φ ψ)
-  id := sorry
-  comp := sorry
+  Hom φ ψ := SliceMorphism φ ψ
+  id A := {
+    h := C.id A.A
+    satisfies := by simp
+  }
+  comp h₁ h₂ := {
+    h := C.comp h₁.h h₂.h
+    satisfies :=
+      by rw [CategoryTheory.Category.assoc, h₂.satisfies, h₁.satisfies]
+  }
+  comp_id := by simp
+  id_comp := by simp
+  assoc := by simp
 
 /-
 Problem 4:
