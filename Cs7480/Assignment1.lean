@@ -3,6 +3,9 @@ import Mathlib.Data.Fintype.Defs
 import Mathlib.Data.Finset.Powerset
 import Mathlib.CategoryTheory.Limits.Shapes.Terminal
 import Mathlib.CategoryTheory.Limits.Shapes.Products
+import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
+
+open CategoryTheory
 
 /-
 Problem 1:
@@ -55,7 +58,7 @@ Problem 1:
     This will involve showing that some entailments are valid.
 -/
 
-inductive Formula (Names : Type) where
+inductive Formula (Names : Type*) where
   | var (name : Names)
   | top
   | bot
@@ -63,9 +66,9 @@ inductive Formula (Names : Type) where
   | or (φ : Formula Names) (ψ : Formula Names)
   | not (φ : Formula Names)
 
-def Subst (Names : Type) := Names → Bool
+def Subst (Names : Type*) := Names → Bool
 
-def eval {Names : Type} : Formula Names → Subst Names → Bool
+def eval {Names : Type*} : Formula Names → Subst Names → Bool
   | Formula.var x, γ => γ x
   | Formula.top, _ => true
   | Formula.bot, _ => false
@@ -74,14 +77,14 @@ def eval {Names : Type} : Formula Names → Subst Names → Bool
   | Formula.not φ, γ => not (eval φ γ)
 
 -- the set of substitutions which evaluate to true
-def Mods {Names : Type} (φ : Formula Names) : Set (Subst Names) :=
+def Mods {Names : Type*} (φ : Formula Names) : Set (Subst Names) :=
   {γ | eval φ γ = true}
 
 -- semantic entailment
-def entails {Names : Type} (φ ψ : Formula Names) : Prop :=
+def entails {Names : Type*} (φ ψ : Formula Names) : Prop :=
   Mods φ ⊆ Mods ψ
 
-instance formulaCategory {Names : Type} : CategoryTheory.Category (Formula Names) where
+instance formulaCategory {Names : Type*} : Category (Formula Names) where
   -- Prop isn't in the correct type universe (because of Names), so we must lift it
   Hom φ ψ := PLift (entails φ ψ)
   -- straightforward-ly, the identity and composition functions
@@ -173,11 +176,11 @@ structure FTSMorphism (φ ψ : FTS) where
   (f : φ.X → ψ.X)
   (satisfies : f ∘ φ.α = ψ.α ∘ f)
 
-instance FTSCategory : CategoryTheory.Category FTS where
+instance FTSCategory : Category FTS where
   Hom X Y := FTSMorphism X Y
   id A := {
     f := id
-    satisfies := by simp
+    satisfies := by simp only [Function.id_comp, Function.comp_id]
   }
   comp {x y z} h₁ h₂ := by
     obtain ⟨f, satisfies_f⟩ := h₁
@@ -218,31 +221,31 @@ Problem 3:
     \mathsf{cod}$, $\mathsf{id}$, and $\mathsf{comp}$.
 -/
 
-structure sliceObject (T : Type) (C : CategoryTheory.Category T) (X : T) where
+structure sliceObject (T : Type*) (C : Category T) (X : T) where
   (A : T)
   (morphism : C.Hom A X)
 
 structure SliceMorphism
-  {T : Type} {C : CategoryTheory.Category T} {X : T} (φ ψ : sliceObject T C X)
+  {T : Type*} [C : Category T] {X : T} (φ ψ : sliceObject T C X)
 where
   (h : C.Hom φ.A ψ.A)
   (satisfies : C.comp h ψ.morphism = φ.morphism)
 
 instance sliceCategory
-  {T : Type} {C : CategoryTheory.Category T} {X : T} :
-    CategoryTheory.Category (sliceObject T C X) where
+  {T : Type*} [C : Category T] {X : T} :
+    Category (sliceObject T C X) where
   Hom φ ψ := SliceMorphism φ ψ
   id A := {
     h := C.id A.A
-    satisfies := by exact CategoryTheory.Category.id_comp A.morphism
+    satisfies := by exact Category.id_comp A.morphism
   }
   comp h₁ h₂ := {
     h := C.comp h₁.h h₂.h
-    satisfies := by rw [CategoryTheory.Category.assoc, h₂.satisfies, h₁.satisfies]
+    satisfies := by rw [Category.assoc, h₂.satisfies, h₁.satisfies]
   }
-  comp_id := by simp only [CategoryTheory.Category.comp_id, implies_true]
-  id_comp := by simp only [CategoryTheory.Category.id_comp, implies_true]
-  assoc := by simp only [CategoryTheory.Category.assoc, implies_true]
+  comp_id := by simp only [Category.comp_id, implies_true]
+  id_comp := by simp only [Category.id_comp, implies_true]
+  assoc := by simp only [Category.assoc, implies_true]
 
 /-
 Problem 4:
@@ -293,8 +296,8 @@ Problem 5:
     Show that $\mathsf{Formula}$ has products and a terminal object. What do they mean logically?
 -/
 
-theorem FormulaTerminal {Names : Type} : CategoryTheory.Limits.HasTerminal (Formula Names) := by
-  sorry
+instance formulaTerminal {Names : Type} : Limits.HasTerminal (Formula Names) where
+  has_limit := by sorry
 
 /-
 Problem 6:
@@ -312,6 +315,18 @@ Problem 7:
     Note: This may take a lot of space. We will see a better way to prove this later.
 -/
 
+noncomputable def product_isomorphic_assoc {T : Type*} [𝒞 : Category T] {A B C : T}
+  [ab : Limits.HasBinaryProduct A B] [axb_c : Limits.HasBinaryProduct (Limits.prod A B) C]
+    [bc : Limits.HasBinaryProduct B C] [a_bxc : Limits.HasBinaryProduct A (Limits.prod B C)] :
+      Limits.prod (Limits.prod A B) C ≅ Limits.prod A (Limits.prod B C) where
+  hom := Limits.prod.lift
+    (Limits.prod.fst ≫ Limits.prod.fst)
+    (Limits.prod.lift (Limits.prod.fst ≫ Limits.prod.snd) Limits.prod.snd)
+  inv := Limits.prod.lift
+    (Limits.prod.lift Limits.prod.fst (Limits.prod.snd ≫ Limits.prod.fst))
+    (Limits.prod.snd ≫ Limits.prod.snd)
+  hom_inv_id := by ext <;> simp
+  inv_hom_id := by ext <;> simp
 
 /-
 Problem 8:
