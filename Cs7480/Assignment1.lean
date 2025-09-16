@@ -290,14 +290,24 @@ Problem 4:
     for practice, or simply state them.
 -/
 
+-- TODO
 
 /-
 Problem 5:
     Show that $\mathsf{Formula}$ has products and a terminal object. What do they mean logically?
 -/
 
-instance formulaTerminal {Names : Type} : Limits.HasTerminal (Formula Names) where
-  has_limit := by sorry
+instance trueTerminal {Names : Type*} :
+  @Limits.IsTerminal (Formula Names) formulaCategory Formula.top where
+  lift := by
+    intro s
+    simp_all only [Limits.asEmptyCone_pt]
+    tauto
+
+instance formulaTerminal {Names : Type*} : Limits.HasTerminal (Formula Names) := by
+  exact Limits.IsTerminal.hasTerminal trueTerminal
+
+-- TODO: products and logical explanation
 
 /-
 Problem 6:
@@ -305,6 +315,7 @@ Problem 6:
     If you know what coproducts are: does it have coproducts?
 -/
 
+-- TODO
 
 /-
 Problem 7:
@@ -344,6 +355,7 @@ Problem 8:
     where \(1\) is the terminal object of \(\mathsf{FinSet}\).
 -/
 
+-- TODO
 
 /-
 Problem 9:
@@ -362,3 +374,5 @@ Problem 9:
     \end{tikzcd}
     \end{equation}
 -/
+
+-- TODO
