@@ -315,7 +315,7 @@ Problem 7:
     Note: This may take a lot of space. We will see a better way to prove this later.
 -/
 
-noncomputable def product_isomorphic_assoc {T : Type*} [𝒞 : Category T] {A B C : T}
+noncomputable def create_product_isomorphic_assoc {T : Type*} [𝒞 : Category T] {A B C : T}
   [ab : Limits.HasBinaryProduct A B] [axb_c : Limits.HasBinaryProduct (Limits.prod A B) C]
     [bc : Limits.HasBinaryProduct B C] [a_bxc : Limits.HasBinaryProduct A (Limits.prod B C)] :
       Limits.prod (Limits.prod A B) C ≅ Limits.prod A (Limits.prod B C) where
@@ -327,6 +327,13 @@ noncomputable def product_isomorphic_assoc {T : Type*} [𝒞 : Category T] {A B 
     (Limits.prod.snd ≫ Limits.prod.snd)
   hom_inv_id := by ext <;> simp
   inv_hom_id := by ext <;> simp
+
+theorem product_isomorphic_assoc {T : Type*} [𝒞 : Category T] {A B C : T}
+  [ab : Limits.HasBinaryProduct A B] [axb_c : Limits.HasBinaryProduct (Limits.prod A B) C]
+    [bc : Limits.HasBinaryProduct B C] [a_bxc : Limits.HasBinaryProduct A (Limits.prod B C)] :
+      Nonempty (Limits.prod (Limits.prod A B) C ≅ Limits.prod A (Limits.prod B C)) := by
+  constructor
+  exact create_product_isomorphic_assoc
 
 /-
 Problem 8:
