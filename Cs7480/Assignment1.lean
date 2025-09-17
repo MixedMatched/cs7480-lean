@@ -7,6 +7,8 @@ import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 
 open CategoryTheory
 
+set_option trace.Meta.Tactic.simp true
+
 /-
 Problem 1:
   Consider the following grammar of Boolean formulae:
@@ -381,7 +383,40 @@ noncomputable def create_product_isomorphic_assoc {T : Type*} [𝒞 : Category T
       rw [Limits.limit.lift_π]
       dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_snd]
       rw [Category.id_comp]
-  inv_hom_id := by ext <;> simp
+  inv_hom_id := by
+    ext
+    case h₁ =>
+      rw [Limits.prod.comp_lift, Limits.limit.lift_π_assoc]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.pair_obj_left, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Category.id_comp]
+    case h₂.h₁ =>
+      rw [Limits.prod.comp_lift, Limits.limit.lift_π_assoc]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.pair_obj_left, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst, Limits.BinaryFan.mk_snd]
+      rw [Limits.prod.comp_lift, Limits.limit.lift_π_assoc]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.pair_obj_left, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_snd]
+      rw [Category.id_comp]
+    case h₂.h₂ =>
+      rw [Limits.prod.comp_lift, Limits.limit.lift_π_assoc]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.pair_obj_left, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst, Limits.BinaryFan.mk_snd]
+      rw [Limits.prod.comp_lift, Limits.limit.lift_π_assoc]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.pair_obj_left, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_snd]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_snd]
+      rw [Category.id_comp]
 
 theorem product_isomorphic_assoc {T : Type*} [𝒞 : Category T] {A B C : T}
   [ab : Limits.HasBinaryProduct A B] [axb_c : Limits.HasBinaryProduct (Limits.prod A B) C]
