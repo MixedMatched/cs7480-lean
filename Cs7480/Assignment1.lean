@@ -336,7 +336,51 @@ noncomputable def create_product_isomorphic_assoc {T : Type*} [𝒞 : Category T
   inv := Limits.prod.lift
     (Limits.prod.lift Limits.prod.fst (Limits.prod.snd ≫ Limits.prod.fst))
     (Limits.prod.snd ≫ Limits.prod.snd)
-  hom_inv_id := by ext <;> simp
+  hom_inv_id := by
+    ext
+    case h₁.h₁ =>
+      rw [Limits.prod.comp_lift, Limits.prod.comp_lift]
+      nth_rw 2 [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π_assoc]
+      dsimp only [Limits.pair_obj_right, Limits.BinaryFan.mk_snd]
+      nth_rw 2 [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π_assoc, @Limits.prod.lift_fst, Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Category.id_comp]
+    case h₁.h₂ =>
+      rw [Limits.prod.comp_lift, Limits.prod.comp_lift]
+      nth_rw 2 [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π_assoc]
+      dsimp only [Limits.pair_obj_right, Limits.BinaryFan.mk_snd]
+      nth_rw 2 [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π_assoc]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.pair_obj_right, Limits.BinaryFan.mk_snd]
+      nth_rw 2 [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_snd]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_snd]
+      rw [Category.id_comp]
+    case h₂ =>
+      rw [Limits.prod.comp_lift, Limits.prod.comp_lift]
+      nth_rw 2 [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π_assoc]
+      dsimp only [Limits.pair_obj_right, Limits.BinaryFan.mk_snd]
+      nth_rw 2 [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π_assoc]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_snd]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_fst]
+      rw [Limits.limit.lift_π]
+      dsimp only [Limits.BinaryFan.mk_pt, Limits.BinaryFan.mk_snd]
+      rw [Category.id_comp]
   inv_hom_id := by ext <;> simp
 
 theorem product_isomorphic_assoc {T : Type*} [𝒞 : Category T] {A B C : T}
