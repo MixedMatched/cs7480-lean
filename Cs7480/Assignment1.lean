@@ -7,8 +7,6 @@ import Mathlib.CategoryTheory.Limits.Shapes.BinaryProducts
 
 open CategoryTheory
 
-set_option trace.Meta.Tactic.simp true
-
 /-
 Problem 1:
   Consider the following grammar of Boolean formulae:
