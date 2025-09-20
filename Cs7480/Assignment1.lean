@@ -290,7 +290,64 @@ Problem 4:
     for practice, or simply state them.
 -/
 
--- TODO
+-- TODO: finish
+
+inductive STLCType
+  | unit
+  | pair : STLCType → STLCType → STLCType
+  | fn : STLCType → STLCType → STLCType
+
+inductive STLC
+  | unit
+  | bvar : ℕ → STLC
+  | fvar : ℕ → STLC
+  | pair : STLC → STLC → STLC
+  | proj₁ : STLC → STLC
+  | proj₂ : STLC → STLC
+  | lambda : STLCType → STLC → STLC
+  | app : STLC → STLC → STLC
+
+
+namespace STLC
+
+notation t1 " -> " t2 => STLCType.fn t1 t2
+notation "<>" => unit
+notation "€" i => bvar i
+notation "$" x => fvar x
+notation "<" fst "," snd ">" => pair fst snd
+notation "π₁ " term => proj₁ term
+notation "π₂ " term => proj₂ term
+notation "λ " T "," t => lambda T t
+notation t1 " @ " t2 => app t1 t2
+
+@[simp]
+def subst (x : ℕ) (a : STLC) : STLC → STLC
+  | unit => unit
+  | bvar i => bvar i
+  | fvar y => if y = x then a else (fvar y)
+  | pair fst snd => pair (subst x a fst) (subst x a snd)
+  | proj₁ term => proj₁ (subst x a term)
+  | proj₂ term => proj₂ (subst x a term)
+  | lambda T u => lambda T (subst x a u)
+  | app u1 u2 => app (subst x a u1) (subst x a u2)
+
+notation  "["x" // "u"] "t => subst x u t
+
+def free_vars : STLC → Finset ℕ
+  | unit => {}
+  | bvar _ => {}
+  | fvar y => {y}
+  | pair fst snd => (free_vars fst) ∪ (free_vars snd)
+  | proj₁ term => free_vars term
+  | proj₂ term => free_vars term
+  | lambda _ term => free_vars term
+  | app t1 t2 => (free_vars t1) ∪ (free_vars t2)
+
+
+def type (term : STLC) : STLCType := sorry
+
+end STLC
+
 
 /-
 Problem 5:
